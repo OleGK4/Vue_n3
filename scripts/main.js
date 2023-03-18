@@ -86,6 +86,55 @@ Vue.component('column-tasks-work', {
     }
 })
 
+Vue.component('column-testing', {
+    props: {
+        cardList: [],
+    },
+    template: `
+    <div class="col">
+        <card-form class="column"
+            v-for="card in cardList"
+            :card="card"
+            :MoveCard="MoveCard"
+            :last="true">
+        </card-form>
+    </div>
+    `,
+    methods: {
+        MoveCard(card, last) {
+            if (last === undefined) {
+                this.CompareDate(card);
+                eventBus.$emit('MoveToFour', card);
+                this.cardList.splice(this.cardList.indexOf(card), 1);
+            } else {
+                eventBus.$emit('MoveToTwo', card);
+                this.cardList.splice(this.cardList.indexOf(card), 1);
+            }
+        },
+        CompareDate(card) {
+            if (new Date(card.deadline) < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())) {
+                card.completed = true;
+            } else {
+                card.completed = false;
+            }
+        }
+    }
+})
+
+Vue.component('column-completed-tasks', {
+    props: {
+        cardList: [],
+    },
+    template: `
+    <div class="col">
+        <card-form class="column"
+            v-for="card in cardList"
+            :card="card">
+        </card-form>
+    </div>
+    `,
+})
+
 
 
 let app = new Vue({
