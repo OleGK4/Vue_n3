@@ -43,6 +43,49 @@ Vue.component('columns',{
 
 })
 
+Vue.component('column-planned-tasks', {
+    props: {
+        cardList: [],
+    },
+    template: `
+    <div class="col">
+        <card-form class="column"
+            v-for="card in cardList"
+            :card="card"
+            :MoveCard="MoveCard"
+            :del="true">
+        </card-form>
+    </div>
+    `,
+    methods: {
+        MoveCard(card) {
+            eventBus.$emit('MoveToTwo', card)
+            this.cardList.splice(this.cardList.indexOf(card), 1);
+        }
+    }
+})
+
+Vue.component('column-tasks-work', {
+    props: {
+        cardList: [],
+    },
+    template: `
+    <div class="col">
+        <card-form class="column"
+            v-for="card in cardList"
+            :card="card"
+            :MoveCard="MoveCard">
+        </card-form>
+    </div>
+    `,
+    methods: {
+        MoveCard(card) {
+            eventBus.$emit('MoveToThree', card);
+            this.cardList.splice(this.cardList.indexOf(card), 1);
+        }
+    }
+})
+
 
 
 let app = new Vue({
