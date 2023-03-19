@@ -222,6 +222,80 @@ Vue.component('card-form',{
     }
 })
 
+Vue.component('add-reason', {
+    props: {
+        card: Object,
+        MoveCard: Function,
+    },
+    template: `
+    <form class="text-form-card" @submit.prevent="arrReason(reason), MoveCard(card, true)">
+        <textarea v-model="reason" ></textarea>
+        <button type="submit" :disabled="reason == null || reason == ''">Вернуть</button>
+    </form>
+    `,
+    data() {
+        return {
+            reason: null
+        }
+    },
+    methods: {
+        arrReason(reason) {
+            this.card.reason.push(reason);
+        }
+    }
+})
+
+Vue.component('create-card',{
+    template:`
+    <div class="forms-create-card">
+        <form class="text-form-card" @submit.prevent="onSubmit">
+            <label for="title">Заголовок</label>
+            <input v-model="title" id="title" type="text" placeholder="title">
+            <textarea v-model="task" placeholder="task description"></textarea>
+            <input v-model="deadline" type="date">
+            <button type="submit">Создать</button>
+            <p v-if="errors.length">
+                <ul>
+                    <li v-for="error in errors">{{ error }}</li>
+                </ul>
+            </p>
+        </form>
+    </div>
+    `,
+    data(){
+        return {
+            title: null,
+            task: null,
+            deadline: null,
+            dateCreate: null,
+            errors: []
+        }
+    },
+    methods:{
+        onSubmit(){
+            if(this.title && this.task && this.deadline){
+                let card = {
+                    title: this.title,
+                    task: this.task,
+                    deadline: this.deadline,
+                    dateCreate: new Date().toLocaleString(),
+                    reason: [],
+                    completed: null,
+                }
+                eventBus.$emit('card-submitted', card)
+
+                this.title = null
+                this.task = null
+                this.deadline = null
+            } else {
+                if (!this.title) this.errors.push("Заполните заголовок!")
+                if (!this.task) this.errors.push("Заполните описание задачи!")
+                if (!this.deadline) this.errors.push("Выберите дедлайн!")
+            }
+        }
+    }
+})
+
 
 let app = new Vue({
     el: '#app',
