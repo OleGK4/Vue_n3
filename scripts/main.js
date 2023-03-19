@@ -135,6 +135,92 @@ Vue.component('column-completed-tasks', {
     `,
 })
 
+Vue.component('card-edit',{
+    template:`
+    <div class="cardOne">
+    <button type="submit" v-if="show === false" @click="$emit('Edit', isEdit())">Редактирование</button>
+        <form class="text-form-card" v-if="show === true">
+            <label for="title">Редактирование</label>
+            <input v-model="title" id="title" type="text" :placeholder="card.title">
+            <textarea v-model="task" :placeholder="card.task"></textarea>
+            <p>Дэдлайн: {{ card.deadline }}</p>
+            <p>Дата создания: {{ card.dateCreate }}</p>
+            <button type="submit" @click="$emit('Edit', isEdit())">Yes</button>
+            <button type="submit" @click="$emit('Edit', show = false)">No</button>
+        </form>
+    </div>
+    `,
+    data() {
+        return {
+            show: false,
+            title: this.card.title,
+            task: this.card.task,
+        }
+    },
+    props: {
+        card: Object,
+    },
+    methods: {
+        isEdit() {
+            if (this.show == false)
+                this.show = true;
+            else {
+                if (this.title != "")
+                    this.card.title = this.title;
+
+                if (this.task !="")
+                    this.card.task = this.task;
+
+                this.card.dateEdit = new Date().toLocaleString();
+
+                this.show = false;
+            }
+
+            return this.show;
+        }
+    },
+})
+
+Vue.component('card-form',{
+    template: `
+    <div class="cardOne">
+    <div v-if="edit === false">
+    <p>{{ card.title }}</p>
+    <p>{{ card.task }}</p>
+    <p>Deadline:{{ card.deadline }}</p>
+    <p v-if="card.dateEdit != null">Редактирование: {{ card.dateEdit }}</p>
+    <p v-if="last != true && card.reason.length > 0 "></p>
+    <ul >
+    <li v-for="reas in card.reason">{{ reas }}</li>
+    </ul>
+    <p>Дата создания:{{card.dateCreate}}</p>
+    <p v-if="card.completed != null">Карточка:  {{ card.completed ? 'Просрочен' : 'Выполнен' }}</p>
+    <button type="submit" @click="MoveCard(card)"  v-if="card.completed === null">
+    Переместить
+    </button>
+    <button type="submit" v-if="del === true" @click="DeleteCard(card)">Удалить</button>
+            <add-reason
+                v-if="last === true && card.completed === null"
+                :card="card"
+                :MoveCard="MoveCard">
+            </add-reason>
+    </div>
+    <card-edit v-if="card.completed === null" :card="card" @Edit="edit = $event"></card-edit>
+    </div>
+    `,
+    props: {
+        card: Object,
+        edit: Boolean,
+        MoveCard: Function,
+        last: Boolean,
+        del: Boolean,
+    },
+    methods: {
+        DeleteCard(card) {
+            eventBus.$emit('DeleteCard', card);
+        }
+    }
+})
 
 
 let app = new Vue({
